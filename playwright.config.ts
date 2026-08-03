@@ -25,7 +25,7 @@ export default defineConfig({
     { name: "mobile-chrome", use: { ...devices["Pixel 5"] } },
   ],
   webServer: {
-    command: `pnpm build && pnpm start -- -p ${webPort}`,
+    command: `pnpm build && pnpm exec next start --port ${webPort}`,
     port: webPort,
     reuseExistingServer: !isCI,
     timeout: 120_000,

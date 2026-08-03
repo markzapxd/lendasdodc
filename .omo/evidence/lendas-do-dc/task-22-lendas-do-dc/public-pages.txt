@@ -1,0 +1,38 @@
+Task 22: public feed and card browsing pages
+Date: 2026-08-03
+
+Targeted verification
+=====================
+
+Command: pnpm typecheck
+Result: PASS
+Output: tsc --noEmit completed with exit code 0 after the public row boundary parser was added.
+
+Command: pnpm exec biome check "src/app/(public)/layout.tsx" "src/app/(public)/page.tsx" "src/app/(public)/card/[slug]/page.tsx" "src/components/cards/CardGrid.tsx" "src/components/cards/CardCard.tsx" "src/components/messages/MessageFeed.tsx" "src/components/messages/MessageCard.tsx" "src/lib/supabase/public-content.ts"
+Result: PASS with one warning
+Warning: performance/noImgElement recommends next/image for the externally sourced card image. The implementation retains a native image element with explicit dimensions because the task contract uses a direct URL and the repository has no remote image host configuration.
+
+Full repository verification
+============================
+
+Command: pnpm check
+Result: PASS with warnings
+Warnings: Biome reports the existing deprecated recommended configuration field, the codegraph daemon socket entry, and the same native image recommendation.
+
+Command: pnpm build
+Result: BLOCKED by unrelated concurrent route work
+Output: Turbopack reports that src/app/(admin)/page.tsx and src/app/(public)/page.tsx are parallel pages resolving to the same path /. The admin route files were not modified by this task.
+
+Manual browser verification
+===========================
+
+Result: BLOCKED
+Reason: Playwright could not launch because the environment has no Chrome distribution at /opt/google/chrome/chrome. The Next dev server also returned HTTP 500 for / because of the same concurrent /(admin) and /(public) route conflict.
+
+Security checks
+==============
+
+- Public pages query only api.cards and api.messages public columns.
+- Message rendering uses public content, never private content_hmac data.
+- No API route or database migration was added.
+- The form has no unauthenticated database submission path; it only exercises the pending moderation confirmation state requested for this UI task.

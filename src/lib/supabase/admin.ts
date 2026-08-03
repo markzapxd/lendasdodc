@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { serverEnv } from "@/lib/env/server";
 import type { Database } from "@/types/database";
 import "./admin.guard";
@@ -10,7 +10,7 @@ import "./admin.guard";
  * SECURITY: This client MUST only be imported in server-only code.
  * Mark any file importing this with 'server-only' guard.
  */
-export function createAdminClient() {
+export function createAdminClient(): SupabaseClient {
   return createClient<Database>(serverEnv.SUPABASE_URL, serverEnv.SUPABASE_SERVICE_ROLE_KEY, {
     auth: {
       autoRefreshToken: false,

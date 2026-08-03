@@ -7,6 +7,8 @@
 
 import type { AdminId, CardId, MessageId, QueueItemId, ReportId, SessionId } from "@/lib/ids";
 
+export type { CardId, QueueItemId } from "@/lib/ids";
+
 export type AdminUserId = AdminId;
 export type AdminSessionId = SessionId;
 

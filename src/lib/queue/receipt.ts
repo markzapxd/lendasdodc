@@ -1,4 +1,4 @@
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import type { QueueSubmission, SubmissionReceipt } from "./types";
 
 const { RECEIPT_HMAC_SECRET = "" } = process.env;
@@ -37,5 +37,9 @@ export function verifyReceipt(
     .update(`${receiptId}:${contentHash}:${queuedAt}`)
     .digest("hex");
 
-  return receiptHmac === expectedHmac;
+  const providedBytes = Buffer.from(receiptHmac, "hex");
+  const expectedBytes = Buffer.from(expectedHmac, "hex");
+  return (
+    providedBytes.length === expectedBytes.length && timingSafeEqual(providedBytes, expectedBytes)
+  );
 }

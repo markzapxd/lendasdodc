@@ -11,8 +11,8 @@ const sections = [
   /Inputs/i,
   /Textarea/i,
   /Select/i,
-  /Dialog/i,
-  /AlertDialog/i,
+  /^Dialog$/i,
+  /^AlertDialog$/i,
   /Toast/i,
   /Avatar/i,
   /Badge/i,
@@ -48,7 +48,9 @@ test.describe("Primitive Showcase", () => {
     await expect(page.getByRole("alertdialog")).toBeHidden();
 
     await page.getByRole("button", { name: "Aviso success" }).click();
-    await expect(page.getByText("Publicado")).toBeVisible();
+    await expect(
+      page.locator('[data-state="open"]').getByText("Publicado", { exact: true }),
+    ).toBeVisible();
   });
 
   test("buttons are keyboard accessible", async ({ page }) => {

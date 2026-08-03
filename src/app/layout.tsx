@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 
+const { REACT_SCAN, REACT_DEV_TOOLS } = process.env;
+
 export const metadata: Metadata = {
   title: "Lendas do DC",
   description: "Uma plataforma de mensagens anônimas",
@@ -15,11 +17,15 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="h-full antialiased">
       <head>
-        {process.env.NODE_ENV === "development" && (
-          <script src="https://unpkg.com/react-scan/dist/auto.global.js" crossOrigin="anonymous" />
+        {process.env.NODE_ENV === "development" && REACT_SCAN === "true" && (
+          <Script
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
         )}
 
-        {process.env.NODE_ENV === "development" && (
+        {process.env.NODE_ENV === "development" && REACT_DEV_TOOLS === "true" && (
           <Script
             src="//unpkg.com/react-grab/dist/index.global.js"
             crossOrigin="anonymous"

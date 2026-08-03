@@ -1,0 +1,58 @@
+Task 23 verification evidence
+============================
+
+Scope
+-----
+Admin layout, dashboard, messages page, reports page, login page, sidebar, and
+stats card were implemented. The starter src/app/page.tsx was removed because
+the requested src/app/(admin)/page.tsx owns the root route in a clean checkout.
+
+Passing checks
+--------------
+pnpm exec biome check 'src/app/(admin)' src/components/admin
+  Checked 7 files in 37ms. No fixes applied.
+
+pnpm typecheck
+  Exit code 0.
+
+pnpm design:lint
+  DESIGN.md validation passed
+
+Pure non-comment LOC
+--------------------
+src/app/(admin)/layout.tsx: 64
+src/app/(admin)/page.tsx: 23
+src/app/(admin)/messages/page.tsx: 13
+src/app/(admin)/reports/page.tsx: 13
+src/app/(admin)/login/page.tsx: 87
+src/components/admin/Sidebar.tsx: 50
+src/components/admin/StatsCard.tsx: 14
+
+Repository-wide blockers unrelated to this slice
+-------------------------------------------------
+pnpm check
+  Fails in concurrent moderation/report/auth files and an existing CardCard
+  img lint finding. It also reports the existing Biome recommended-config
+  deprecation and codegraph daemon entry warning. The touched admin files pass
+  targeted Biome validation.
+
+pnpm test:unit
+  68 passed, 1 failed. The failing pre-existing concurrent auth test is
+  "clears the cookie when logout has no valid session" and throws while
+  destructuring an undefined Supabase response in src/lib/auth/session.ts.
+
+pnpm build
+  Fails before compiling because concurrent src/app/(public)/page.tsx and
+  src/app/(admin)/page.tsx both resolve to /. The clean checkout containing
+  this task has the starter root page removed; the concurrent public route
+  must be assigned a non-conflicting URL by the orchestrator.
+
+Manual browser QA
+-----------------
+Not run because the production build cannot start while the unrelated parallel
+root-route conflict remains.
+
+LSP diagnostics
+---------------
+Unavailable: the shared LSP daemon was unreachable/timed out. TypeScript and
+targeted Biome checks were used instead.

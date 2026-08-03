@@ -87,7 +87,14 @@ export async function handleSubmit(request: SubmissionRequest): Promise<Submissi
 
   await storeIdempotency(request.idempotencyKey, queueItem.id);
 
-  const enqueued = await enqueueSubmission(queueItem);
+  const enqueued = await enqueueSubmission({
+    id: queueItem.id,
+    cardId: queueItem.cardId,
+    contentHash: queueItem.contentHash,
+    sessionId: queueItem.sessionHmac,
+    receiptHash: queueItem.receiptHash,
+    enqueuedAt: queueItem.enqueuedAt,
+  });
   if (!enqueued) {
     return {
       success: false,

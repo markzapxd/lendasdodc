@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "active_work_id": "lendas-do-dc",
+  "works": {
+    "lendas-do-dc": {
+      "work_id": "lendas-do-dc",
+      "active_plan": ".omo/plans/lendas-do-dc.md",
+      "plan_name": "lendas-do-dc",
+      "session_ids": ["opencode:current"],
+      "status": "active",
+      "worktree_path": null
+    }
+  }
+}

@@ -7,6 +7,7 @@ const navigation = [
   { name: "Dashboard", href: "/" },
   { name: "Mensagens", href: "/messages" },
   { name: "Relatórios", href: "/reports" },
+  { name: "Auditoria", href: "/audit" },
 ] as const;
 
 export function Sidebar() {

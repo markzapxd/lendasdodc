@@ -4,6 +4,8 @@ const RUN_ID = process.env.TEST_RUN_ID || randomUUID().slice(0, 8);
 const WORKTREE_ID = process.env.WORKTREE_ID || process.cwd().split("/").pop() || "default";
 const PORT_OFFSET = hashString(`${WORKTREE_ID}:${RUN_ID}`) % 100;
 
+process.env.TEST_RUN_ID ||= RUN_ID;
+
 export const testEnv = {
   RUN_ID,
   WORKTREE_ID,

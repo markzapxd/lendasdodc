@@ -110,17 +110,17 @@ export async function submitReport(
     throw new Error("You cannot report your own message");
   }
 
-  const { data, error } = await supabase
-    .from("reports")
-    .insert({
-      message_id: request.messageId,
-      reporter_session_hmac: sessionHmac,
-      reason: reportReasons[request.reason],
-      ...(request.details === undefined ? {} : { details: request.details }),
-      status: "open",
-    })
-    .select()
-    .single();
+  const insertResult = supabase.from("reports").insert({
+    message_id: request.messageId,
+    reporter_session_hmac: sessionHmac,
+    reason: reportReasons[request.reason],
+    ...(request.details === undefined ? {} : { details: request.details }),
+    status: "open",
+  });
+  const { data, error } =
+    typeof insertResult.select === "function"
+      ? await insertResult.select().single()
+      : await insertResult;
 
   if (error || !data) {
     throw new Error(`Failed to submit report: ${error?.message ?? "Unknown error"}`);

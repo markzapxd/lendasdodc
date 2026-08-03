@@ -5,6 +5,8 @@
       "**",
       "!**/.next",
       "!**/node_modules",
+      "!**/test-results",
+      "!**/.omo",
       "!**/.omo/run-continuation",
       "!**/.omo/evidence",
       "!**/.omo/start-work",

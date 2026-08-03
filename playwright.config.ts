@@ -4,6 +4,10 @@ import { testEnv } from "./tests/support/test-env.mjs";
 
 const isCI = Object.hasOwn(process.env, "CI");
 const webPort = testEnv.WEB_PORT;
+const { BASE_URL, E2E_BASE_URL } = process.env;
+const baseURL = BASE_URL ?? E2E_BASE_URL ?? `http://localhost:${webPort}`;
+const useLocalWebServer =
+  baseURL.startsWith("http://localhost") || baseURL.startsWith("http://127.0.0.1");
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -16,7 +20,7 @@ export default defineConfig({
     ["json", { outputFile: path.join(testEnv.EVIDENCE_DIR, "e2e-results.json") }],
   ],
   use: {
-    baseURL: `http://localhost:${webPort}`,
+    baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -24,10 +28,14 @@ export default defineConfig({
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile-chrome", use: { ...devices["Pixel 5"] } },
   ],
-  webServer: {
-    command: `pnpm build && pnpm exec next start --port ${webPort}`,
-    port: webPort,
-    reuseExistingServer: !isCI,
-    timeout: 120_000,
-  },
+  ...(useLocalWebServer
+    ? {
+        webServer: {
+          command: `pnpm dev --port ${webPort}`,
+          port: webPort,
+          reuseExistingServer: !isCI,
+          timeout: 120_000,
+        },
+      }
+    : {}),
 });

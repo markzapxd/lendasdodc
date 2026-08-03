@@ -1,0 +1,33 @@
+name: Deployed Smoke
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+env:
+  E2E_BASE_URL: ${{ secrets.STAGING_URL }}
+
+jobs:
+  smoke:
+    name: Production smoke test
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium
+      - name: Run smoke tests
+        run: pnpm exec playwright test tests/e2e/smoke/ --retries=0
+        env:
+          BASE_URL: ${{ secrets.STAGING_URL }}

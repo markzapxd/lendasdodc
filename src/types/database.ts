@@ -7,6 +7,19 @@
 
 import type { AdminId, CardId, MessageId, QueueItemId, ReportId, SessionId } from "@/lib/ids";
 
+type SupabaseTable = {
+  Row: Record<string, unknown>;
+  Insert: Record<string, unknown>;
+  Update: Record<string, unknown>;
+  Relationships: [];
+};
+
+type SupabaseSchema = {
+  Tables: Record<string, SupabaseTable>;
+  Views: Record<string, never>;
+  Functions: Record<string, never>;
+};
+
 export type { CardId, QueueItemId } from "@/lib/ids";
 
 export type AdminUserId = AdminId;
@@ -170,6 +183,7 @@ export interface AuditLog {
 }
 
 export interface Database {
+  public: SupabaseSchema;
   readonly api: {
     readonly cards: Card;
     readonly messages: Message;

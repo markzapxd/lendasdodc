@@ -5,8 +5,7 @@ import "./globals.css";
 const { REACT_SCAN, REACT_DEV_TOOLS } = process.env;
 
 export const metadata: Metadata = {
-  title: "Lendas do DC",
-  description: "Uma plataforma de mensagens anônimas",
+  title: "larplandia",
 };
 
 export default function RootLayout({

@@ -18,23 +18,36 @@ export default function AdminLayout({
   useEffect(() => {
     if (isLoginPage) {
       setLoading(false);
+      setAuthenticated(false);
       return;
     }
 
+    let isMounted = true;
+
     fetch("/api/admin/me")
       .then((response) => {
+        if (!isMounted) return;
         if (response.ok) {
           setAuthenticated(true);
         } else {
-          router.push("/login");
+          setAuthenticated(false);
+          router.replace("/login");
         }
       })
       .catch(() => {
-        router.push("/login");
+        if (!isMounted) return;
+        setAuthenticated(false);
+        router.replace("/login");
       })
       .finally(() => {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, [isLoginPage, router]);
 
   if (isLoginPage) {

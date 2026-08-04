@@ -18,6 +18,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const response = NextResponse.json({ success: true });
   response.cookies.delete(AUTH_CONFIG.cookieName);
+  response.cookies.delete(AUTH_CONFIG.csrfCookieName);
 
   return response;
 }

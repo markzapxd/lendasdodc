@@ -107,6 +107,7 @@ describe("admin authentication", () => {
       const result = await createAdminSession("admin-1");
 
       expect(result.token).toMatch(/^[0-9a-f]{64}$/);
+      expect(result.csrfToken).toMatch(/^[0-9a-f]{64}$/);
       expect(result.session.adminUserId).toBe("admin-1");
       expect(sessionFrom).toHaveBeenCalledWith("admin_sessions");
       expect(sessionInsert).toHaveBeenCalledWith(

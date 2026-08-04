@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getReportDetails, resolveReport } from "@/lib/admin/resolve";
 import { getTokenFromCookie, validateAdminSession } from "@/lib/auth/session";
+import { requireAdmin } from "@/lib/moderation/admin-auth";
 
 interface RouteContext {
   readonly params: Promise<{ readonly id: string }>;
@@ -44,14 +45,13 @@ export async function GET(request: NextRequest, { params }: RouteContext): Promi
  * Resolve a report.
  */
 export async function PATCH(request: NextRequest, { params }: RouteContext): Promise<NextResponse> {
-  const token = getTokenFromCookie(request.headers.get("cookie"));
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const session = await validateAdminSession(token);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  let adminId: string;
+  try {
+    ({ adminId } = await requireAdmin(request, true));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    const status = message === "Forbidden" ? 403 : message === "Unauthorized" ? 401 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 
   let body: unknown;
@@ -77,7 +77,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext): Pro
     const result = await resolveReport(
       id,
       parsedBody.data.status,
-      session.adminUserId,
+      adminId,
       parsedBody.data.deleteMessage,
     );
 

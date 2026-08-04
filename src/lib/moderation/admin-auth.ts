@@ -47,13 +47,18 @@ export async function requireAdmin(
     throw new Error("Unauthorized");
   }
 
-  if (requireCsrf && cookieToken && !bearerToken) {
+  if (requireCsrf && cookieToken && bearerToken) {
+    throw new Error("Forbidden");
+  }
+
+  if (requireCsrf && cookieToken) {
     const csrfToken = request.headers.get("x-csrf-token");
     if (!csrfToken) {
       throw new Error("Forbidden");
     }
 
     const { data, error } = await createAdminClient()
+      .schema("private")
       .from("admin_sessions")
       .select("csrf_token_hash")
       .eq("id", session.id)
@@ -63,5 +68,5 @@ export async function requireAdmin(
     }
   }
 
-  return { adminId: session.adminUserId, csrfRequired: Boolean(cookieToken && !bearerToken) };
+  return { adminId: session.adminUserId, csrfRequired: Boolean(requireCsrf && cookieToken) };
 }

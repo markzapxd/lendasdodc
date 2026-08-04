@@ -1,0 +1,16 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "regions": ["gru1"],
+  "crons": [
+    {
+      "path": "/api/cron/publish",
+      "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/cron/worker",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

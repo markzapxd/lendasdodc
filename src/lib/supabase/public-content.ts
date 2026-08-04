@@ -3,7 +3,7 @@ import { asCardId, asMessageId } from "@/lib/ids";
 import type { Card, Message } from "@/types/database";
 
 const cardRowSchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
   name: z.string(),
   slug: z.string(),
   description: z.string().nullable(),

@@ -31,8 +31,7 @@ export async function generateMetadata({ params }: CardPageProps): Promise<Metad
   const cardMetadata = parsePublicCardMetadata(card);
 
   return {
-    title: `${cardMetadata.name} - Lendas do DC`,
-    description: cardMetadata.description ?? "Mensagens anônimas para esta heroína.",
+    title: `${cardMetadata.name} - larpolandia`,
   };
 }
 
@@ -68,15 +67,12 @@ export default async function CardPage({ params }: CardPageProps) {
   return (
     <div className="mx-auto w-full max-w-[1280px] px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <header className="mb-10 grid max-w-3xl gap-3">
-        <p className="text-sm font-semibold uppercase tracking-wide text-red-500">
-          Mural da heroína
-        </p>
         <h1 className="text-3xl font-bold leading-tight text-text-primary sm:text-4xl">
           {publicCard.name}
         </h1>
-        <p className="text-lg text-text-secondary">
-          {publicCard.description ?? "Deixe uma mensagem anônima para este mural."}
-        </p>
+        {publicCard.description ? (
+          <p className="text-lg text-text-secondary">{publicCard.description}</p>
+        ) : null}
       </header>
 
       <MessageFeed

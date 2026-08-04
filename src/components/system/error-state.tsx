@@ -1,5 +1,5 @@
 import type { Icon } from "@phosphor-icons/react";
-import { ArrowClockwise, WarningCircle } from "@phosphor-icons/react";
+import { ArrowClockwise, WarningCircle } from "@phosphor-icons/react/ssr";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

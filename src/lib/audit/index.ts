@@ -14,13 +14,18 @@ function asError(error: unknown): Error {
 export async function recordAuditEvent(event: AuditEvent): Promise<void> {
   try {
     const supabase = createAdminClient();
-    const { error } = await supabase.from("audit_log").insert({
-      actor_id: event.actorId,
-      action: event.action,
-      entity_type: event.entityType,
-      entity_id: event.entityId,
-      context_json: event.context,
-    });
+    const { error } = await supabase
+      .schema("private")
+      .from("audit_log")
+      .insert({
+        admin_id: event.actorId === "system" ? null : event.actorId,
+        action: event.action,
+        resource_type: event.entityType,
+        resource_id: event.entityId === "system" ? null : event.entityId,
+        old_values: event.oldValues ?? null,
+        new_values: event.newValues ?? null,
+        metadata: event.context,
+      });
 
     if (error) {
       console.error("Failed to record audit event:", error);

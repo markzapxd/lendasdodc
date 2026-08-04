@@ -4,10 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigation = [
-  { name: "Dashboard", href: "/" },
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "Cards", href: "/cards" },
   { name: "Mensagens", href: "/messages" },
   { name: "Relatórios", href: "/reports" },
   { name: "Auditoria", href: "/audit" },
+  { name: "Configurações", href: "/settings" },
 ] as const;
 
 export function Sidebar() {

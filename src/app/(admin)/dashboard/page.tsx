@@ -9,7 +9,7 @@ export default function AdminDashboard() {
         <StatsCard title="Mensagens Pendentes" value="--" description="Aguardando moderação" />
         <StatsCard title="Relatórios Ativos" value="--" description="Requerem atenção" />
         <StatsCard title="Mensagens Hoje" value="--" description="Publicadas nas últimas 24h" />
-        <StatsCard title="Total de Cards" value="--" description="Heroínas cadastradas" />
+        <StatsCard title="Total de Cards" value="--" description="" />
       </div>
 
       <section

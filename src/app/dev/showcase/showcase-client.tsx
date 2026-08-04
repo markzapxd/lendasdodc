@@ -29,13 +29,6 @@ export function ShowcaseClient() {
                 <span className="text-sm text-text-secondary">Sistema de primitivas</span>
               </Cluster>
               <div className="grid gap-4">
-                <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
-                  Lendas do DC <span className="text-red-500">/</span> Showcase
-                </h1>
-                <p className="max-w-2xl text-lg text-text-secondary">
-                  Um mural de estados, ritmo e acessibilidade. Cada componente abaixo é uma peça
-                  pronta para o produto.
-                </p>
               </div>
             </header>
             <FoundationsShowcase />

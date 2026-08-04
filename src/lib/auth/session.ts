@@ -34,11 +34,12 @@ function toAdminSession(data: {
  */
 export async function createAdminSession(
   adminUserId: string,
-): Promise<{ readonly session: AdminSession; readonly token: string }> {
+): Promise<{ readonly session: AdminSession; readonly token: string; readonly csrfToken: string }> {
   const supabase = createAdminClient();
   const token = randomBytes(32).toString("hex");
+  const csrfToken = randomBytes(32).toString("hex");
   const tokenHash = hashToken(token);
-  const csrfTokenHash = hashToken(randomBytes(32).toString("hex"));
+  const csrfTokenHash = hashToken(csrfToken);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + AUTH_CONFIG.sessionDurationMs);
 
@@ -61,7 +62,7 @@ export async function createAdminSession(
     throw new Error(`Failed to create session: ${error?.message ?? "unknown database error"}`);
   }
 
-  return { session: toAdminSession(data), token };
+  return { session: toAdminSession(data), token, csrfToken };
 }
 
 /**

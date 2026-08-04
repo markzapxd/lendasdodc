@@ -27,9 +27,9 @@ GRANT USAGE ON SCHEMA private TO service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA private TO service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA private TO service_role;
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA private TO service_role;
-GRANT SELECT ON ALL TABLES IN SCHEMA api TO service_role;
-REVOKE INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER
-  ON ALL TABLES IN SCHEMA api FROM service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA api TO service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA api TO service_role;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA api TO service_role;
 
 -- Pin function lookup to trusted schemas.
 ALTER FUNCTION private.update_updated_at() SET search_path = '';

@@ -49,9 +49,16 @@ export const AUTH_CONFIG = {
   lockoutDurationMs: 15 * 60 * 1000,
   /** Cookie name */
   cookieName: "_ldc_admin_session",
+  csrfCookieName: "_ldc_admin_csrf",
   /** Cookie options */
   cookieOptions: {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+  },
+  csrfCookieOptions: {
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",

@@ -16,6 +16,7 @@ export type AuditAction =
   | "report_created"
   | "report_reviewed"
   | "report_resolved"
+  | "settings.update"
   | "system_error"
   | "security_event";
 
@@ -33,6 +34,8 @@ export interface AuditEvent {
   readonly entityId: string;
   /** Additional context */
   readonly context: Record<string, unknown>;
+  readonly oldValues?: Record<string, unknown>;
+  readonly newValues?: Record<string, unknown>;
   /** Timestamp */
   readonly timestamp: number;
 }

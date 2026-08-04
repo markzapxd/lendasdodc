@@ -10,8 +10,7 @@ export function CardGrid({ cards }: CardGridProps) {
   if (cards.length === 0) {
     return (
       <EmptyState
-        title="Nenhuma heroína disponível"
-        description="Os murais estão sendo preparados. Volte em breve para escolher por onde começar."
+        title="nada ainda"
       />
     );
   }

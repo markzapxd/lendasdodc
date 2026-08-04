@@ -12,7 +12,10 @@ const serverEnvironmentSchema = z.object({
   ADMIN_SESSION_SECRET: z.string().min(32),
   TURNSTILE_SECRET_KEY: z.string().min(1),
   CRON_SECRET: z.string().min(1),
-  ALERT_WEBHOOK_URL: z.string().url().optional(),
+  ALERT_WEBHOOK_URL: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().url().optional(),
+  ),
 });
 
 const {

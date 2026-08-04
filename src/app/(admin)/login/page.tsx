@@ -31,7 +31,7 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        router.push("/");
+        router.push("/dashboard");
       } else {
         const payload: unknown = await response.json();
         const parsed = loginResponseSchema.safeParse(payload);
@@ -52,8 +52,8 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="grid gap-4">
           <Input
             id="email"
-            label="Email"
-            type="email"
+            label="Usuário ou Email"
+            type="text"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="username"

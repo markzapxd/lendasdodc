@@ -3,8 +3,8 @@ project_id = "lendasdodc"
 [api]
 enabled = true
 port = 54321
-schemas = ["public", "api", "graphql_public"]
-extra_search_path = ["public", "extensions"]
+schemas = ["public", "api", "private", "graphql_public"]
+extra_search_path = ["public", "extensions", "private"]
 max_rows = 1000
 
 [db]

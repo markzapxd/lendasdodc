@@ -27,9 +27,9 @@ export function CardCard({ card }: CardCardProps) {
       <div className="grid gap-4 p-6">
         <div className="grid gap-2">
           <h2 className="text-xl font-semibold text-text-primary">{card.name}</h2>
-          <p className="line-clamp-3 text-text-secondary">
-            {card.description ?? "Um mural aberto para mensagens anônimas."}
-          </p>
+          {card.description ? (
+            <p className="line-clamp-3 text-text-secondary">{card.description}</p>
+          ) : null}
         </div>
 
         <div className="flex items-center justify-between gap-4 text-sm text-text-secondary">

@@ -4,6 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Message } from "@/types/database";
+import { submitMessageAction } from "@/app/(public)/actions";
 import { MessageCard } from "./MessageCard";
 
 interface MessageFeedProps {
@@ -16,8 +17,9 @@ export function MessageFeed({ messages, cardId }: MessageFeedProps) {
   const [content, setContent] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!content.trim()) {
@@ -25,11 +27,25 @@ export function MessageFeed({ messages, cardId }: MessageFeedProps) {
     }
 
     setSubmitting(true);
-    window.setTimeout(() => {
-      setSubmitted(true);
-      setContent("");
+    setError(null);
+    
+    // Generate a unique idempotency key for this submission
+    const idempotencyKey = `msg_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+    
+    try {
+      const result = await submitMessageAction(cardId, content, idempotencyKey);
+      
+      if (result.success) {
+        setSubmitted(true);
+        setContent("");
+      } else {
+        setError(result.error.message);
+      }
+    } catch (err) {
+      setError("Erro ao enviar mensagem. Tente novamente.");
+    } finally {
       setSubmitting(false);
-    }, 1000);
+    }
   }
 
   return (
@@ -71,8 +87,11 @@ export function MessageFeed({ messages, cardId }: MessageFeedProps) {
               showCount
               required
             />
+            {error && (
+              <p className="text-sm font-medium text-red-500">{error}</p>
+            )}
             <div className="flex justify-end">
-              <Button type="submit" loading={submitting} disabled={!content.trim()}>
+              <Button type="submit" loading={submitting} disabled={!content.trim() || undefined}>
                 Enviar mensagem
               </Button>
             </div>

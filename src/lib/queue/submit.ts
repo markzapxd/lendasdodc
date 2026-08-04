@@ -1,6 +1,11 @@
 import { createHash, createHmac } from "node:crypto";
 import { asCardId, asQueueItemId } from "@/lib/ids";
-import { checkRateLimit, enqueueSubmission, RATE_LIMITS } from "@/lib/redis";
+import {
+  checkGlobalPanic,
+  checkRateLimit,
+  enqueueSubmission,
+  RATE_LIMITS,
+} from "@/lib/redis";
 import { createAnonClient } from "@/lib/supabase";
 import { checkIdempotency, storeIdempotency } from "./dedup";
 import { generateReceipt } from "./receipt";
@@ -18,6 +23,28 @@ export async function handleSubmit(request: SubmissionRequest): Promise<Submissi
   const validation = validateSubmission(request);
   if (!validation.valid) {
     return { success: false, error: validation.error };
+  }
+
+  const globalPanic = await checkGlobalPanic(RATE_LIMITS.globalPanic);
+  if (!globalPanic.allowed) {
+    return {
+      success: false,
+      error: {
+        code: "GLOBAL_LOCKOUT",
+        message: `O sistema está temporariamente trancado devido ao alto volume de tráfego. Tente novamente em ${Math.ceil(globalPanic.lockoutRemainingSeconds / 60)} minutos.`,
+      },
+    };
+  }
+
+  const ipRateLimit = await checkRateLimit(request.ip, RATE_LIMITS.ipSubmission);
+  if (!ipRateLimit.allowed) {
+    return {
+      success: false,
+      error: {
+        code: "RATE_LIMITED",
+        message: "Too many submissions from this IP. Please try again later.",
+      },
+    };
   }
 
   const rateLimit = await checkRateLimit(request.sessionToken, RATE_LIMITS.submission);
@@ -44,6 +71,7 @@ export async function handleSubmit(request: SubmissionRequest): Promise<Submissi
 
   const supabase = createAnonClient();
   const { data: card, error: cardError } = await supabase
+    .schema("api")
     .from("cards")
     .select("id")
     .eq("id", request.cardId)
@@ -146,6 +174,13 @@ function validateSubmission(
     return {
       valid: false,
       error: { code: "INVALID_INPUT", message: "Idempotency key is required." },
+    };
+  }
+
+  if (!request.ip || typeof request.ip !== "string") {
+    return {
+      valid: false,
+      error: { code: "INVALID_INPUT", message: "IP address is required." },
     };
   }
 

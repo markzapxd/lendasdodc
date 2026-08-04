@@ -34,6 +34,7 @@ export interface SubmissionRequest {
   readonly content: string;
   readonly sessionToken: string;
   readonly idempotencyKey: string;
+  readonly ip: string;
 }
 
 /**
@@ -45,6 +46,7 @@ export type SubmissionResult =
 
 export interface SubmissionError {
   readonly code:
+    | "GLOBAL_LOCKOUT"
     | "RATE_LIMITED"
     | "DUPLICATE"
     | "CARD_NOT_FOUND"

@@ -5,7 +5,7 @@ import { isAdminAuthenticated } from "@/lib/admin/reports";
 
 export default async function CardsPage() {
   if (!(await isAdminAuthenticated())) {
-    redirect("/login");
+    redirect("/morango");
   }
 
   const cards = await getCards();

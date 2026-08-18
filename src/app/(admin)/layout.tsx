@@ -11,7 +11,7 @@ export default function AdminLayout({
 }>) {
   const pathname = usePathname();
   const router = useRouter();
-  const isLoginPage = pathname === "/login";
+  const isLoginPage = pathname === "/morango";
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -31,13 +31,13 @@ export default function AdminLayout({
           setAuthenticated(true);
         } else {
           setAuthenticated(false);
-          router.replace("/login");
+          router.replace("/morango");
         }
       })
       .catch(() => {
         if (!isMounted) return;
         setAuthenticated(false);
-        router.replace("/login");
+        router.replace("/morango");
       })
       .finally(() => {
         if (isMounted) {
@@ -56,9 +56,10 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-charcoal-900">
-        <div className="text-text-secondary" role="status" aria-live="polite">
-          Carregando...
+      <div className="flex min-h-screen items-center justify-center bg-[#08040d]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#ec195a] border-t-transparent shadow-[0_0_15px_rgba(236,25,90,0.6)]" />
+          <span className="text-xs font-mono text-[#a595b8]/70">Verificando sessão...</span>
         </div>
       </div>
     );
@@ -69,10 +70,10 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-dvh bg-charcoal-900">
+    <div className="flex min-h-screen bg-[#08040d] text-white">
       <a
         href="#admin-content"
-        className="absolute left-4 top-4 z-10 -translate-y-16 rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-text-inverse focus:translate-y-0 focus:outline-2 focus:outline-offset-2 focus:outline-focus"
+        className="absolute left-4 top-4 z-50 -translate-y-16 rounded-xl bg-[#ec195a] px-3.5 py-2 text-xs font-bold text-white transition-transform focus:translate-y-0"
       >
         Pular para o conteúdo principal
       </a>

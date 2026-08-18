@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MagnifyingGlass, X } from "@phosphor-icons/react";
 import { AsciiHero3D } from "@/components/system/AsciiHero3D";
+import { getCachedAvatarMap, setCachedAvatarMap } from "@/lib/avatar-cache";
+import { getRandomNekoImages } from "@/lib/nekos";
 import type { Card } from "@/types/database";
 import { CardCard } from "./CardCard";
 
@@ -12,15 +14,55 @@ interface PublicExplorerProps {
 
 export function PublicExplorer({ initialCards }: PublicExplorerProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [nekoImages, setNekoImages] = useState<Record<string, string>>({});
 
-  const filteredCards = initialCards.filter((card) => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return true;
-    return (
-      card.name.toLowerCase().includes(query) ||
-      card.slug.toLowerCase().includes(query)
-    );
-  });
+  useEffect(() => {
+    let isMounted = true;
+
+    // 1. Instantly load from 15-minute local cache if available
+    const cachedMap = getCachedAvatarMap();
+    if (Object.keys(cachedMap).length > 0) {
+      setNekoImages(cachedMap);
+    }
+
+    // 2. Find cards missing cached images
+    const missingCards = initialCards.filter((card) => !card.image_url && !cachedMap[card.id]);
+    if (missingCards.length === 0) return;
+
+    // 3. Fetch missing images in ONE single batch API request
+    getRandomNekoImages(missingCards.length).then((images) => {
+      if (!isMounted || images.length === 0) return;
+
+      const newEntries: Record<string, string> = {};
+      missingCards.forEach((card, index) => {
+        const img = images[index % images.length];
+        if (img) {
+          newEntries[card.id] = img;
+        }
+      });
+
+      setNekoImages((prev) => {
+        const updated = { ...prev, ...newEntries };
+        setCachedAvatarMap(updated);
+        return updated;
+      });
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialCards]);
+
+  const filteredCards = [...initialCards]
+    .filter((card) => {
+      const query = searchQuery.trim().toLowerCase();
+      if (!query) return true;
+      return (
+        card.name.toLowerCase().includes(query) ||
+        card.slug.toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
 
   return (
     <div className="mx-auto w-full max-w-[1280px] px-4 py-6 sm:px-6 lg:px-8">
@@ -36,7 +78,7 @@ export function PublicExplorer({ initialCards }: PublicExplorerProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Pesquisar por nome..."
-            className="w-full rounded-xl border border-[#2b1742]/60 bg-[#12081a]/80 py-2.5 pl-10 pr-9 text-xs sm:text-sm text-white placeholder:text-[#a595b8]/50 outline-none transition-all focus:border-[#ec195a]/60 focus:bg-[#1a0c24]"
+            className="w-full rounded-xl border border-white/10 bg-[#212121] py-2.5 pl-10 pr-9 text-xs sm:text-sm text-white placeholder:text-[#aaaaaa] outline-none transition-all focus:border-white/25 focus:bg-[#272727]"
           />
           {searchQuery ? (
             <button
@@ -59,10 +101,12 @@ export function PublicExplorer({ initialCards }: PublicExplorerProps) {
             : "Nenhuma pessoa cadastrada ainda."}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredCards.map((card) => (
-            <CardCard key={card.id} card={card} />
-          ))}
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {filteredCards.map((card) => {
+            const avatarUrl = nekoImages[card.id] || card.image_url;
+            const cardWithAvatar = avatarUrl ? { ...card, image_url: avatarUrl } : card;
+            return <CardCard key={card.id} card={cardWithAvatar} />;
+          })}
         </div>
       )}
     </div>

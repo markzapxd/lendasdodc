@@ -19,14 +19,26 @@ const nextConfig: NextConfig = {
   ],
 
   images: {
-    remotePatterns: supabaseHostname
-      ? [
-          {
-            protocol: "https",
-            hostname: supabaseHostname,
-          },
-        ]
-      : [],
+    localPatterns: [
+      {
+        pathname: "/api/nekos/image",
+        search: "?url=*",
+      },
+    ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "nekos.best",
+      },
+      ...(supabaseHostname
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: supabaseHostname,
+            },
+          ]
+        : []),
+    ],
   },
 
   reactCompiler: true,

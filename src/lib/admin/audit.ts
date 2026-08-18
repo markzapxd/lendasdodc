@@ -101,7 +101,7 @@ async function requireAdminPageAccess(): Promise<void> {
   const token = cookieStore.get(AUTH_CONFIG.cookieName)?.value;
   const session = token ? await validateAdminSession(token) : null;
 
-  if (!session) redirect("/login");
+  if (!session) redirect("/morango");
 }
 
 function normalizePage(value: number | undefined): number {

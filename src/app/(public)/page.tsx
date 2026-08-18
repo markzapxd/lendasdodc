@@ -12,7 +12,7 @@ const getPublicCards = unstable_cache(
         "id, name, slug, description, image_url, image_alt, status, message_count, last_activity_at, created_at, updated_at",
       )
       .eq("status", "active")
-      .order("message_count", { ascending: false });
+      .order("name", { ascending: true });
 
     if (error) {
       throw new Error(`Failed to fetch public cards: ${error.message}`, { cause: error });

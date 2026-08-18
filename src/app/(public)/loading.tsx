@@ -1,4 +1,10 @@
+"use client";
+
+import { useTheme } from "@/components/theme/ThemeContext";
+
 export default function Loading() {
+  const { config } = useTheme();
+
   return (
     <div
       className="flex min-h-[60vh] w-full items-center justify-center py-20"
@@ -7,10 +13,14 @@ export default function Loading() {
     >
       <div className="relative flex items-center justify-center">
         {/* Glow effect background */}
-        <div className="absolute h-12 w-12 rounded-full bg-[#ec195a]/20 blur-md" />
+        <div
+          className="absolute h-12 w-12 rounded-full blur-md opacity-20"
+          style={{ backgroundColor: config.primaryHex }}
+        />
         {/* Spinning Circle */}
         <svg
-          className="h-10 w-10 animate-spin text-[#ec195a]"
+          className="h-10 w-10 animate-spin"
+          style={{ color: config.primaryHex }}
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"

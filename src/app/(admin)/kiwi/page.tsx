@@ -5,7 +5,7 @@ import { getSettings } from "@/lib/admin/settings";
 
 export default async function SettingsPage() {
   if (!(await isAdminAuthenticated())) {
-    redirect("/login");
+    redirect("/morango");
   }
 
   const settings = await getSettings();

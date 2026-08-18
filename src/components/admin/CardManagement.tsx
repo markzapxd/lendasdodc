@@ -143,42 +143,50 @@ export function CardManagement({ initialCards }: CardManagementProps) {
   }
 
   return (
-    <div className="grid gap-6">
-      <div className="flex flex-col gap-4 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="grid gap-6 select-none">
+      {/* Top Header & Actions */}
+      <div className="flex flex-col gap-4 border-b border-[#21122e] pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-text-secondary" role="status" aria-live="polite">
+          <h1 className="text-2xl font-black text-white">Gerenciar Cards</h1>
+          <p className="text-xs font-mono text-[#a595b8]/70" role="status" aria-live="polite">
             {cards.length} {cards.length === 1 ? "card cadastrado" : "cards cadastrados"}
           </p>
           {error ? (
-            <p className="mt-2 text-sm text-red-500" role="alert">
+            <p className="mt-2 text-xs font-semibold text-red-400" role="alert">
               {error}
             </p>
           ) : null}
         </div>
-        <Button type="button" onClick={openCreate}>
-          <Plus className="size-4" aria-hidden="true" />
-          Novo card
-        </Button>
+        <button
+          type="button"
+          onClick={openCreate}
+          className="flex items-center justify-center gap-2 rounded-xl bg-[#ec195a] px-4 py-2.5 text-xs font-bold text-white shadow-[0_0_15px_rgba(236,25,90,0.35)] transition-all hover:bg-[#d4144e]"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          <span>Novo Card</span>
+        </button>
       </div>
 
-      <section aria-label="Filtros de cards" className="grid gap-2 sm:max-w-xs">
-        <label htmlFor="card-status-filter" className="text-sm font-medium text-text-primary">
+      {/* Filter Selector */}
+      <section aria-label="Filtros de cards" className="grid gap-1.5 sm:max-w-xs">
+        <label htmlFor="card-status-filter" className="text-xs font-mono text-[#a595b8]">
           Filtrar por status
         </label>
         <select
           id="card-status-filter"
           value={filter}
           onChange={(event) => setFilter(event.target.value as CardStatus | "all")}
-          className="min-h-11 rounded-md border bg-charcoal-900 px-3 text-base text-text-primary outline-none focus-visible:border-border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          className="rounded-xl border border-[#2b1742] bg-[#0b0512] px-3 py-2 text-xs text-white outline-none transition-colors focus:border-[#ec195a]/70"
         >
           {(Object.keys(statusLabels) as Array<CardStatus | "all">).map((status) => (
-            <option key={status} value={status}>
+            <option key={status} value={status} className="bg-[#0b0512]">
               {statusLabels[status]}
             </option>
           ))}
         </select>
       </section>
 
+      {/* Cards List */}
       <section aria-label="Lista de cards">
         {visibleCards.length === 0 ? (
           <EmptyState
@@ -191,57 +199,70 @@ export function CardManagement({ initialCards }: CardManagementProps) {
             {...(filter === "all" ? { action: { label: "Criar card", onClick: openCreate } } : {})}
           />
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
             {visibleCards.map((card) => (
               <article
                 key={card.id}
-                className="grid gap-4 border border-border bg-surface-elevated p-4 sm:p-6"
+                className="flex flex-col justify-between gap-4 rounded-2xl border border-[#2b1742]/60 bg-[#12081a]/60 p-5 shadow-lg transition-all hover:border-[#ec195a]/40 hover:bg-[#180a24]"
               >
-                <header className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="grid gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-xl font-semibold text-text-primary">{card.name}</h2>
-                      <Badge variant={statusVariants[card.status]}>
-                        {statusLabels[card.status]}
-                      </Badge>
+                <div>
+                  <div className="flex items-start justify-between gap-2 border-b border-[#21122e] pb-3">
+                    <div>
+                      <h2 className="text-base font-bold text-white leading-tight">{card.name}</h2>
+                      <p className="font-mono text-xs text-[#ec195a]">@{card.slug}</p>
                     </div>
-                    <p className="font-mono text-sm text-text-secondary">/{card.slug}</p>
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                        card.status === "active"
+                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                          : card.status === "archived"
+                            ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                            : "bg-red-500/20 text-red-400 border border-red-500/30"
+                      }`}
+                    >
+                      {statusLabels[card.status]}
+                    </span>
                   </div>
-                  <p className="text-sm text-text-secondary">
-                    {card.message_count} {card.message_count === 1 ? "mensagem" : "mensagens"}
+
+                  <p className="mt-3 text-xs text-[#a595b8]/80 leading-relaxed line-clamp-2">
+                    {card.description ?? "Sem descrição cadastrada."}
                   </p>
-                </header>
+                </div>
 
-                <p className="max-w-[68ch] text-text-secondary">
-                  {card.description ?? "Sem descrição cadastrada."}
-                </p>
+                <div className="flex items-center justify-between gap-2 border-t border-[#21122e] pt-3">
+                  <span className="text-[11px] font-mono text-[#a595b8]/60">
+                    {card.message_count} {card.message_count === 1 ? "msg" : "msgs"}
+                  </span>
 
-                <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => openEdit(card)}>
-                    <PencilSimple className="size-4" aria-hidden="true" />
-                    Editar
-                  </Button>
-                  {card.status === "active" ? (
-                    <Button
+                  <div className="flex gap-2">
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setStatusCard(card)}
+                      onClick={() => openEdit(card)}
+                      className="flex items-center gap-1 rounded-lg border border-[#2b1742] bg-[#1a0e28] px-2.5 py-1.5 text-xs text-white transition-colors hover:border-[#ec195a]/60 hover:text-[#ec195a]"
                     >
-                      <Archive className="size-4" aria-hidden="true" />
-                      Arquivar
-                    </Button>
-                  ) : card.status === "archived" ? (
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setStatusCard(card)}
-                    >
-                      <ArrowCounterClockwise className="size-4" aria-hidden="true" />
-                      Restaurar
-                    </Button>
-                  ) : null}
+                      <PencilSimple className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Editar</span>
+                    </button>
+                    {card.status === "active" ? (
+                      <button
+                        type="button"
+                        onClick={() => setStatusCard(card)}
+                        className="flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-xs text-red-400 transition-colors hover:bg-red-500/20"
+                      >
+                        <Archive className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Arquivar</span>
+                      </button>
+                    ) : card.status === "archived" ? (
+                      <button
+                        type="button"
+                        onClick={() => setStatusCard(card)}
+                        className="flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-400 transition-colors hover:bg-amber-500/20"
+                      >
+                        <ArrowCounterClockwise className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>Restaurar</span>
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               </article>
             ))}

@@ -7,7 +7,7 @@ import { getAbuseBuckets, getRecentThreats, getSecurityStats } from "@/lib/admin
 
 export default async function SecurityPage() {
   if (!(await isAdminAuthenticated())) {
-    redirect("/login");
+    redirect("/morango");
   }
 
   const [stats, threats, abuseBuckets] = await Promise.all([

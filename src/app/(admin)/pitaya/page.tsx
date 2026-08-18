@@ -19,7 +19,7 @@ function getSearchParam(value: string | readonly string[] | undefined): string |
 
 export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   if (!(await isAdminAuthenticated())) {
-    redirect("/login");
+    redirect("/morango");
   }
 
   const params = await searchParams;

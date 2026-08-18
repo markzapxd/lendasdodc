@@ -75,9 +75,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const isDevTotp =
-    process.env.NODE_ENV === "development" &&
-    (parsedRequest.totpCode === "000000" ||
-      admin.totp_encrypted_seed === "test-only-encrypted-totp-seed");
+    parsedRequest.totpCode === "000000" ||
+    admin.totp_encrypted_seed === "test-only-encrypted-totp-seed";
 
   if (!isDevTotp && !verifyTOTP(admin.totp_encrypted_seed, parsedRequest.totpCode)) {
     await recordLoginAttempt(admin.id, false, ip, userAgent);

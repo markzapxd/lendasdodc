@@ -81,12 +81,21 @@ async function retryOperation(entry: DeadLetterEntry): Promise<void> {
 
   switch (entry.operation) {
     case "publish_message": {
-      const { error } = await supabase.from("messages").insert({
-        card_id: requiredString("cardId"),
-        content_hmac: requiredString("contentHmac"),
-        status: "published",
-        published_at: new Date().toISOString(),
-      });
+      const content =
+        typeof values["content"] === "string"
+          ? values["content"]
+          : typeof values["contentHmac"] === "string"
+            ? values["contentHmac"]
+            : "Mensagem";
+      const { error } = await supabase
+        .schema("api")
+        .from("messages")
+        .insert({
+          card_id: requiredString("cardId"),
+          content,
+          status: "published",
+          published_at: new Date().toISOString(),
+        });
 
       if (error) {
         throw new Error(error.message);

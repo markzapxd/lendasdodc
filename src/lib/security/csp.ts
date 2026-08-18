@@ -22,18 +22,24 @@ export interface CSPConfig {
 }
 
 export function buildCSP(config: CSPConfig): string {
+  const isDev = process.env.NODE_ENV === "development";
+  const wsSupabaseUrl = config.supabaseUrl ? config.supabaseUrl.replace(/^http/, "ws") : "";
+
   const directives = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' ${config.supabaseUrl} data: blob:`,
+    `img-src 'self' ${config.supabaseUrl} data: blob: https:`,
     "font-src 'self' https://fonts.gstatic.com",
-    `connect-src 'self' ${config.supabaseUrl}`,
+    `connect-src 'self' ${config.supabaseUrl} ${wsSupabaseUrl} ws: wss:`,
     "frame-ancestors 'none'",
     "base-uri 'none'",
     "form-action 'self'",
-    "upgrade-insecure-requests",
   ];
+
+  if (!isDev) {
+    directives.push("upgrade-insecure-requests");
+  }
 
   if (config.reportUri) {
     directives.push(`report-uri ${config.reportUri}`);

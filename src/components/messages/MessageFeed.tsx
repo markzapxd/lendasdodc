@@ -1,10 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import * as React from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import type { Message } from "@/types/database";
+import { Check, PaperPlaneRight, UserCircle } from "@phosphor-icons/react";
 import { submitMessageAction } from "@/app/(public)/actions";
+import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
+import type { Message } from "@/types/database";
 import { MessageCard } from "./MessageCard";
 
 interface MessageFeedProps {
@@ -13,11 +14,17 @@ interface MessageFeedProps {
   readonly cardName?: string;
 }
 
-export function MessageFeed({ messages, cardId }: MessageFeedProps) {
+export function MessageFeed({ messages: initialMessages, cardId }: MessageFeedProps) {
   const [content, setContent] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const router = useRouter();
+
+  const { messages: liveMessages } = useRealtimeMessages({
+    cardId,
+    initialMessages,
+  });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,20 +35,24 @@ export function MessageFeed({ messages, cardId }: MessageFeedProps) {
 
     setSubmitting(true);
     setError(null);
-    
-    // Generate a unique idempotency key for this submission
+
     const idempotencyKey = `msg_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-    
+
     try {
-      const result = await submitMessageAction(cardId, content, idempotencyKey);
-      
+      const result = await submitMessageAction(cardId, content.trim(), idempotencyKey);
+
       if (result.success) {
         setSubmitted(true);
         setContent("");
+        router.refresh();
+        const timer = setTimeout(() => {
+          setSubmitted(false);
+        }, 3000);
+        return () => clearTimeout(timer);
       } else {
         setError(result.error.message);
       }
-    } catch (err) {
+    } catch (_err) {
       setError("Erro ao enviar mensagem. Tente novamente.");
     } finally {
       setSubmitting(false);
@@ -49,53 +60,73 @@ export function MessageFeed({ messages, cardId }: MessageFeedProps) {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(18rem,3fr)] lg:items-start">
-      <section className="grid gap-6" aria-label="Mensagens">
-        {messages.length === 0 ? (
-          <div className="border border-dashed border-border p-8 text-center">
-            <p className="text-text-secondary">Nenhuma mensagem ainda. Seja o primeiro.</p>
+    <div className="w-full">
+      {/* Inline Post Composer (Top of Feed) */}
+      <section className="border-b border-[#21122e] p-4 sm:p-5 bg-[#0b0512]">
+        {submitted ? (
+          <div
+            className="flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3.5 text-xs text-emerald-400 font-medium"
+            role="status"
+          >
+            <Check className="h-4 w-4 shrink-0" />
+            <span>Mensagem publicada com sucesso no perfil!</span>
           </div>
         ) : (
-          <div className="grid gap-4">
-            {messages.map((message) => (
-              <MessageCard key={message.id} message={message} />
-            ))}
-          </div>
+          <form id={`message-form-${cardId}`} onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="flex gap-3 items-start">
+              {/* Default User Avatar Icon */}
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1b0e29] border border-[#2b1742] text-[#a595b8]">
+                <UserCircle className="h-6 w-6 text-[#ec195a]" />
+              </div>
+
+              <div className="flex-1 flex flex-col gap-2">
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Escreva uma mensagem anônima..."
+                  maxLength={500}
+                  rows={3}
+                  required
+                  className="w-full bg-transparent text-sm sm:text-base text-white placeholder:text-[#a595b8]/60 outline-none resize-none border-b border-[#2b1742]/50 pb-2 focus:border-[#ec195a]/60 transition-colors"
+                />
+
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  <div className="flex items-center gap-3 ml-auto">
+                    {/* Character counter */}
+                    <span className="text-xs font-mono text-[#a595b8]/50">
+                      {content.length}/500
+                    </span>
+
+                    {/* Post button */}
+                    <button
+                      type="submit"
+                      disabled={submitting || !content.trim()}
+                      className="flex items-center gap-1.5 rounded-full bg-[#ec195a] px-4 py-1.5 text-xs font-bold text-white shadow-[0_0_12px_rgba(236,25,90,0.35)] transition-all hover:bg-[#d4144e] disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <span>{submitting ? "Publicando..." : "Publicar"}</span>
+                      <PaperPlaneRight weight="fill" className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {error && <p className="text-xs font-medium text-red-500 pl-13">{error}</p>}
+          </form>
         )}
       </section>
 
-      <section
-        className="border border-border bg-surface-elevated p-6"
-        aria-label="Enviar mensagem"
-      >
-        {submitted ? (
-          <div className="grid gap-3 border border-green-500/50 bg-green-500/10 p-4" role="status">
-            <p className="font-semibold text-green-500">Mensagem enviada para moderação.</p>
-            <p className="text-sm text-text-secondary">Ela será publicada após a revisão.</p>
-            <Button variant="outline" onClick={() => setSubmitted(false)}>
-              Enviar outra
-            </Button>
+      {/* Messages List (X/Twitter style timeline) */}
+      <section aria-label="Mensagens publicadas" className="divide-y divide-[#21122e]">
+        {liveMessages.length === 0 ? (
+          <div className="py-16 text-center text-[#a595b8]">
+            <p className="text-sm">Nenhuma mensagem ainda.</p>
+            <p className="text-xs text-[#a595b8]/60 mt-1">Seja o primeiro a publicar algo!</p>
           </div>
         ) : (
-          <form id={`message-form-${cardId}`} className="grid gap-4" onSubmit={handleSubmit}>
-            <Textarea
-              label="Sua mensagem"
-              value={content}
-              onChange={(event) => setContent(event.currentTarget.value)}
-              placeholder="Escreva sua mensagem anônima..."
-              maxLength={500}
-              showCount
-              required
-            />
-            {error && (
-              <p className="text-sm font-medium text-red-500">{error}</p>
-            )}
-            <div className="flex justify-end">
-              <Button type="submit" loading={submitting} disabled={!content.trim() || undefined}>
-                Enviar mensagem
-              </Button>
-            </div>
-          </form>
+          liveMessages.map((message) => (
+            <MessageCard key={message.id} message={message} />
+          ))
         )}
       </section>
     </div>

@@ -7,7 +7,12 @@ vi.mock("@/lib/redis", () => ({
   enqueueSubmission: vi.fn(),
   getRedis: vi.fn(),
   RATE_LIMITS: {
-    globalPanic: { windowMs: 600000, maxRequests: 100, lockoutSeconds: 3600, keyPrefix: "rl:panic" },
+    globalPanic: {
+      windowMs: 600000,
+      maxRequests: 100,
+      lockoutSeconds: 3600,
+      keyPrefix: "rl:panic",
+    },
     ipSubmission: { windowMs: 60000, maxRequests: 5, keyPrefix: "rl:submit_ip" },
     submission: { windowMs: 60000, maxRequests: 5, keyPrefix: "rl:submit" },
   },

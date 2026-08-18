@@ -1,6 +1,6 @@
 "use client";
 
-import { createBrowserClient } from "@/lib/supabase";
+import { createBrowserClient } from "@/lib/supabase/client";
 import { parsePublicMessage } from "@/lib/supabase/public-content";
 import type { Message } from "@/types/database";
 import type { RealtimeEventType, RealtimeMessageEvent, RealtimeOptions } from "./types";
@@ -25,6 +25,9 @@ function parseMessage(value: unknown): Message | null {
  */
 export function subscribeToMessages(options: RealtimeOptions): () => void {
   const supabase = createBrowserClient();
+  const channelName = options.cardId
+    ? `messages:${options.cardId}`
+    : `messages:${Math.random().toString(36).substring(2)}`;
   const messageChanges = {
     event: "*" as const,
     schema: "api" as const,
@@ -33,7 +36,7 @@ export function subscribeToMessages(options: RealtimeOptions): () => void {
   };
 
   const channel = supabase
-    .channel("messages")
+    .channel(channelName)
     .on("postgres_changes", messageChanges, (payload) => {
       try {
         const event: RealtimeMessageEvent = {
@@ -74,7 +77,7 @@ export function subscribeToPlatformState(
   const supabase = createBrowserClient();
 
   const channel = supabase
-    .channel("platform_state")
+    .channel(`platform_state:${Math.random().toString(36).substring(2)}`)
     .on(
       "postgres_changes",
       {

@@ -24,5 +24,5 @@ export type { LockOptions } from "./lock";
 export { acquireLock, releaseLock, withLock } from "./lock";
 export type { QueueItem, QueueStats } from "./queue";
 export { completeQueueItem, dequeueSubmissions, enqueueSubmission, getQueueStats } from "./queue";
-export type { RateLimitConfig, RateLimitResult, GlobalPanicConfig } from "./rate-limit";
-export { checkRateLimit, checkGlobalPanic, RATE_LIMITS } from "./rate-limit";
+export type { GlobalPanicConfig, RateLimitConfig, RateLimitResult } from "./rate-limit";
+export { checkGlobalPanic, checkRateLimit, RATE_LIMITS } from "./rate-limit";

@@ -7,6 +7,7 @@ import type { CardId, QueueItemId } from "@/types/database";
 export interface QueueSubmission {
   readonly id: QueueItemId;
   readonly cardId: CardId;
+  readonly content?: string | undefined;
   readonly contentHmac: string;
   readonly contentHash: string;
   readonly sessionHmac: string;

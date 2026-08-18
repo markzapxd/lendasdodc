@@ -11,8 +11,8 @@ import type { Database } from "@/types/database";
  * role key in browser code.
  */
 export function createBrowserClient() {
-  const { NEXT_PUBLIC_SUPABASE_URL: supabaseUrl, NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey } =
-    process.env;
+  const supabaseUrl = process.env["NEXT_PUBLIC_SUPABASE_URL"];
+  const supabaseAnonKey = process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"];
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(

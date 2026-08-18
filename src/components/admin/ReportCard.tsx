@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ const statusVariants: Record<string, "default" | "secondary" | "destructive"> = 
 export function ReportCard({ report }: { readonly report: Report }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function handleResolve(status: "resolved" | "dismissed") {
     setLoading(true);
@@ -48,7 +50,7 @@ export function ReportCard({ report }: { readonly report: Report }) {
         throw new Error("Não foi possível atualizar este relatório.");
       }
 
-      window.location.reload();
+      router.refresh();
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Erro ao atualizar relatório.");
       setLoading(false);

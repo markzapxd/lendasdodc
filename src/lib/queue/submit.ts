@@ -1,11 +1,6 @@
 import { createHash, createHmac } from "node:crypto";
 import { asCardId, asQueueItemId } from "@/lib/ids";
-import {
-  checkGlobalPanic,
-  checkRateLimit,
-  enqueueSubmission,
-  RATE_LIMITS,
-} from "@/lib/redis";
+import { checkGlobalPanic, checkRateLimit, enqueueSubmission, RATE_LIMITS } from "@/lib/redis";
 import { createAnonClient } from "@/lib/supabase";
 import { checkIdempotency, storeIdempotency } from "./dedup";
 import { generateReceipt } from "./receipt";
@@ -99,6 +94,7 @@ export async function handleSubmit(request: SubmissionRequest): Promise<Submissi
   const queueItemWithoutReceipt: QueueSubmission = {
     id: asQueueItemId(`q_${enqueuedAt}_${Math.random().toString(36).slice(2)}`),
     cardId: asCardId(request.cardId),
+    content: request.content,
     contentHmac,
     contentHash,
     sessionHmac,
@@ -118,6 +114,7 @@ export async function handleSubmit(request: SubmissionRequest): Promise<Submissi
   const enqueued = await enqueueSubmission({
     id: queueItem.id,
     cardId: queueItem.cardId,
+    content: request.content,
     contentHash: queueItem.contentHash,
     sessionId: queueItem.sessionHmac,
     receiptHash: queueItem.receiptHash,

@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { CardGrid } from "@/components/cards/CardGrid";
+import { PublicExplorer } from "@/components/cards/PublicExplorer";
 import { createAnonClient } from "@/lib/supabase";
 import { parsePublicCard } from "@/lib/supabase/public-content";
 
@@ -27,10 +27,5 @@ const getPublicCards = unstable_cache(
 export default async function HomePage() {
   const cards = await getPublicCards();
 
-  return (
-    <div className="mx-auto w-full max-w-[1280px] px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-      <h1 className="sr-only">Lendas do DC</h1>
-      <CardGrid cards={cards} />
-    </div>
-  );
+  return <PublicExplorer initialCards={cards} />;
 }

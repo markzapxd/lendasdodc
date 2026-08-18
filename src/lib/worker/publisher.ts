@@ -17,12 +17,15 @@ export async function processSubmissions(cardId: string, limit = 10): Promise<nu
 
   for (const item of items) {
     try {
-      const { error } = await supabase.from("messages").insert({
-        card_id: item.cardId,
-        content_hmac: item.contentHash,
-        status: "published",
-        published_at: new Date().toISOString(),
-      });
+      const { error } = await supabase
+        .schema("api")
+        .from("messages")
+        .insert({
+          card_id: item.cardId,
+          content: item.content ?? item.contentHash,
+          status: "published",
+          published_at: new Date().toISOString(),
+        });
 
       if (error) {
         console.error(`Failed to publish message: ${error.message}`);

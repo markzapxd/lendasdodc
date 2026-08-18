@@ -4,6 +4,7 @@ import { getRedis } from "./index";
 export type QueueItem = {
   readonly id: string;
   readonly cardId: string;
+  readonly content?: string | undefined;
   readonly contentHash: string;
   readonly sessionId: string;
   readonly receiptHash: string;
@@ -20,6 +21,7 @@ export type QueueStats = {
 const queueItemSchema = z.object({
   id: z.string(),
   cardId: z.string(),
+  content: z.string().optional(),
   contentHash: z.string(),
   sessionId: z.string(),
   receiptHash: z.string(),
@@ -87,7 +89,10 @@ export async function dequeueSubmissions(cardId: string, limit: number): Promise
     [String(limit), String(Date.now())],
   );
 
-  return members.map((member) => queueItemSchema.parse(JSON.parse(member) as unknown));
+  return (members ?? []).map((member) => {
+    const parsed = typeof member === "string" ? JSON.parse(member) : member;
+    return queueItemSchema.parse(parsed);
+  });
 }
 
 export async function completeQueueItem(

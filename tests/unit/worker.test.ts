@@ -4,6 +4,7 @@ import type { QueueItem } from "@/lib/redis";
 const mocks = vi.hoisted(() => {
   const messageInsert = vi.fn();
   const cardsQuery = vi.fn();
+  const schema = vi.fn(() => ({ from }));
   const from = vi.fn((table: string) =>
     table === "messages" ? { insert: messageInsert } : { select: cardsQuery },
   );
@@ -15,7 +16,7 @@ const mocks = vi.hoisted(() => {
   return {
     cardsQuery,
     completeQueueItem: vi.fn(),
-    createAdminClient: vi.fn(() => ({ from })),
+    createAdminClient: vi.fn(() => ({ schema, from })),
     dequeueSubmissions: vi.fn(),
     getRedis: vi.fn(() => redis),
     messageInsert,
@@ -77,7 +78,6 @@ describe("Publisher Worker", () => {
     expect(mocks.messageInsert).toHaveBeenCalledWith(
       expect.objectContaining({
         card_id: "card-1",
-        content_hmac: "content-hash",
         status: "published",
       }),
     );

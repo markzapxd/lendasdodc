@@ -114,7 +114,7 @@ export async function checkGlobalPanic(
   );
 
   const [allowed, ttl] = result;
-  
+
   return {
     allowed: allowed === 1,
     lockoutRemainingSeconds: ttl,

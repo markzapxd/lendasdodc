@@ -28,8 +28,7 @@ export function ShowcaseClient() {
                 </Badge>
                 <span className="text-sm text-text-secondary">Sistema de primitivas</span>
               </Cluster>
-              <div className="grid gap-4">
-              </div>
+              <div className="grid gap-4"></div>
             </header>
             <FoundationsShowcase />
             <ControlsShowcase selectValue={selectValue} onSelectChange={setSelectValue} />

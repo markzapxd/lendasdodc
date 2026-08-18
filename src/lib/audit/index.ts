@@ -5,6 +5,12 @@ function asError(error: unknown): Error {
   return error instanceof Error ? error : new Error(String(error));
 }
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function toValidUuid(value: string | undefined): string | null {
+  return value && UUID_REGEX.test(value) ? value : null;
+}
+
 /**
  * Record an audit event.
  *
@@ -18,10 +24,10 @@ export async function recordAuditEvent(event: AuditEvent): Promise<void> {
       .schema("private")
       .from("audit_log")
       .insert({
-        admin_id: event.actorId === "system" ? null : event.actorId,
+        admin_id: toValidUuid(event.actorId),
         action: event.action,
         resource_type: event.entityType,
-        resource_id: event.entityId === "system" ? null : event.entityId,
+        resource_id: toValidUuid(event.entityId),
         old_values: event.oldValues ?? null,
         new_values: event.newValues ?? null,
         metadata: event.context,
@@ -44,11 +50,17 @@ export async function recordAuditEvent(event: AuditEvent): Promise<void> {
 export async function recordSecurityEvent(event: SecurityEvent): Promise<void> {
   try {
     const supabase = createAdminClient();
-    const { error } = await supabase.from("security_events").insert({
-      event_type: event.type,
-      severity: event.severity,
-      context_json: event.context,
-    });
+    const adminIdStr = event.context?.["adminId"];
+    const adminId = typeof adminIdStr === "string" ? toValidUuid(adminIdStr) : null;
+    const { error } = await supabase
+      .schema("private")
+      .from("security_events")
+      .insert({
+        event_type: event.type,
+        severity: event.severity,
+        admin_id: adminId,
+        metadata: event.context ?? {},
+      });
 
     if (error) {
       console.error("Failed to record security event:", error);

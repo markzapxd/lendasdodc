@@ -24,8 +24,10 @@ const mocks = vi.hoisted(() => {
     return { update: reportUpdate };
   });
 
+  const schema = vi.fn(() => ({ from }));
+
   return {
-    createAdminClient: vi.fn(() => ({ from })),
+    createAdminClient: vi.fn(() => ({ schema, from })),
     from,
     getRedis: vi.fn(() => redis),
     messageInsert,
@@ -154,7 +156,6 @@ describe("Dead Letter Queue", () => {
     expect(mocks.messageInsert).toHaveBeenCalledWith(
       expect.objectContaining({
         card_id: "card-1",
-        content_hmac: "content-hash",
         status: "published",
       }),
     );

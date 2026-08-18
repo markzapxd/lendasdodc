@@ -18,7 +18,7 @@ export function CardCard({ card }: CardCardProps) {
 	return (
 		<Link
 			href={`/card/${card.slug}`}
-			className="group flex items-center justify-between gap-3.5 rounded-xl border border-white/10 bg-[#212121] p-3 transition-all duration-200 hover:border-white/25 hover:bg-[#272727]"
+			className="group flex items-center justify-between gap-3.5 rounded-xl border border-white/20 bg-neutral-400/20 p-3 shadow-lg shadow-black/15 backdrop-blur-lg transition-all duration-200 hover:border-white/35 hover:bg-neutral-300/25"
 		>
 			{/* Avatar & User Info */}
 			<div className="flex items-center gap-3 min-w-0">
@@ -49,7 +49,9 @@ export function CardCard({ card }: CardCardProps) {
 					<h2 className="truncate text-sm sm:text-base font-semibold text-white transition-colors">
 						{card.name}
 					</h2>
-					<span className="text-xs text-[#a595b8]/70">{messageLabel}</span>
+					<span className="text-sm font-bold text-white/80">
+						{card.message_count} <span className="text-xs font-normal text-[#aaaaaa]">{card.message_count === 1 ? 'msg' : 'msgs'}</span>
+					</span>
 				</div>
 			</div>
 		</Link>

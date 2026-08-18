@@ -48,9 +48,27 @@ export interface Card {
   readonly description: string | null;
   readonly image_url: string | null;
   readonly image_alt: string | null;
+  readonly profile_photo_id: string | null;
   readonly status: CardStatus;
   readonly message_count: number;
   readonly last_activity_at: Date | null;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
+export interface ProfilePhoto {
+  readonly id: string;
+  readonly card_id: CardId;
+  readonly image_url: string;
+  readonly image_alt: string | null;
+  readonly is_active: boolean;
+  readonly created_at: Date;
+}
+
+export interface ProfilePhotoVote {
+  readonly card_id: CardId;
+  readonly photo_id: string;
+  readonly session_hmac: string;
   readonly created_at: Date;
   readonly updated_at: Date;
 }
@@ -189,6 +207,7 @@ export interface Database {
     readonly messages: Message;
     readonly card_slug_aliases: CardSlugAlias;
     readonly platform_state: PlatformState;
+    readonly profile_photos: ProfilePhoto;
   };
   readonly private: {
     readonly queue_items: QueueItem;
@@ -207,5 +226,6 @@ export interface Database {
     readonly totp_steps: unknown;
     readonly recovery_codes_used: unknown;
     readonly migration_ledger: unknown;
+    readonly profile_photo_votes: ProfilePhotoVote;
   };
 }

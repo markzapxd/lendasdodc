@@ -19,7 +19,7 @@ export function PublicHeader() {
 					href="/"
 					className="text-xl font-black tracking-tight text-white hover:opacity-80 transition-opacity"
 				>
-					a
+					Resenha
 				</Link>
 
 				{/* Theme Palette Switcher */}

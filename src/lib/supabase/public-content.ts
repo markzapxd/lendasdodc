@@ -9,6 +9,7 @@ const cardRowSchema = z.object({
   description: z.string().nullable(),
   image_url: z.string().url().nullable(),
   image_alt: z.string().nullable(),
+  profile_photo_id: z.string().uuid().nullable().default(null),
   status: z.enum(["active", "archived", "hidden", "deleted"]),
   message_count: z.number().int().nonnegative(),
   last_activity_at: z.coerce.date().nullable(),

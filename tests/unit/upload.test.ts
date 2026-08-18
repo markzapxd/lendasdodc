@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   moveToProduction: vi.fn(),
   recordAuditEvent: vi.fn(),
   requireAdmin: vi.fn(),
+  addProfilePhoto: vi.fn(),
 }));
 
 vi.mock("@/lib/images", () => ({
@@ -24,6 +25,10 @@ vi.mock("@/lib/audit", () => ({
 
 vi.mock("@/lib/moderation/admin-auth", () => ({
   requireAdmin: mocks.requireAdmin,
+}));
+
+vi.mock("@/lib/profile-photos", () => ({
+  addProfilePhoto: mocks.addProfilePhoto,
 }));
 
 const metadata = {
@@ -58,6 +63,12 @@ beforeEach(() => {
   mocks.moveToProduction.mockResolvedValue("https://example.com/prod/image.jpg");
   mocks.recordAuditEvent.mockResolvedValue(undefined);
   mocks.requireAdmin.mockRejectedValue(new Error("Unauthorized"));
+  mocks.addProfilePhoto.mockResolvedValue({
+    id: "photo-1",
+    card_id: "card-1",
+    image_url: "https://example.com/prod/image.jpg",
+    image_alt: null,
+  });
 });
 
 describe("Upload Processing", () => {
@@ -132,6 +143,12 @@ describe("POST /api/admin/upload", () => {
     expect(await response.json()).toEqual({
       success: true,
       url: "https://example.com/prod/image.jpg",
+      profilePhoto: {
+        id: "photo-1",
+        card_id: "card-1",
+        image_url: "https://example.com/prod/image.jpg",
+        image_alt: null,
+      },
       metadata,
     });
     expect(mocks.recordAuditEvent).toHaveBeenCalledWith({

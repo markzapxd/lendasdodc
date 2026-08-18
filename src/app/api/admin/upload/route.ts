@@ -3,6 +3,7 @@ import { ImageUploadValidationError, processImageUpload } from "@/lib/admin/uplo
 import { recordAuditEvent } from "@/lib/audit";
 import { IMAGE_CONFIG } from "@/lib/images";
 import { requireAdmin } from "@/lib/moderation/admin-auth";
+import { addProfilePhoto } from "@/lib/profile-photos";
 
 const uploadFormSchema = z
   .object({
@@ -29,6 +30,10 @@ function errorResponse(error: unknown): Response {
 
   if (error instanceof Error && error.message === "Forbidden") {
     return Response.json({ error: error.message }, { status: 403 });
+  }
+
+  if (error instanceof Error && error.message.includes("limite de 3 fotos")) {
+    return Response.json({ error: error.message }, { status: 400 });
   }
 
   return Response.json({ error: "Internal server error" }, { status: 500 });
@@ -87,6 +92,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const buffer = Buffer.from(await parsedUpload.file.arrayBuffer());
     const result = await processImageUpload(buffer, parsedUpload.file.type, parsedUpload.cardId);
+    const profilePhoto = await addProfilePhoto(parsedUpload.cardId, result.publicUrl);
 
     await recordAuditEvent({
       actorId: adminId,
@@ -97,7 +103,12 @@ export async function POST(request: Request): Promise<Response> {
       timestamp: Date.now(),
     });
 
-    return Response.json({ success: true, url: result.publicUrl, metadata: result.metadata });
+    return Response.json({
+      success: true,
+      url: result.publicUrl,
+      profilePhoto,
+      metadata: result.metadata,
+    });
   } catch (error) {
     return errorResponse(error);
   }

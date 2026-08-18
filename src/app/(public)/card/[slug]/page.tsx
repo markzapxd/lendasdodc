@@ -1,9 +1,11 @@
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { ProfileAvatar } from "@/components/cards/ProfileAvatar";
+import { ProfilePhotoVoting } from "@/components/cards/ProfilePhotoVoting";
 import { MessageFeed } from "@/components/messages/MessageFeed";
+import { getProfilePhotoRanking } from "@/lib/profile-photos";
 import { createAnonClient } from "@/lib/supabase";
 import {
   parsePublicCard,
@@ -46,7 +48,7 @@ export default async function CardPage({ params }: CardPageProps) {
     .schema("api")
     .from("cards")
     .select(
-      "id, name, slug, description, image_url, image_alt, status, message_count, last_activity_at, created_at, updated_at",
+      "id, name, slug, description, image_url, image_alt, profile_photo_id, status, message_count, last_activity_at, created_at, updated_at",
     )
     .eq("slug", slug)
     .eq("status", "active")
@@ -58,16 +60,17 @@ export default async function CardPage({ params }: CardPageProps) {
 
   const publicCard = parsePublicCard(card);
 
-  const { data: messages } = await supabase
-    .schema("api")
-    .from("messages")
-    .select("id, card_id, content, nickname, status, published_at, created_at, updated_at")
-    .eq("card_id", publicCard.id)
-    .eq("status", "published")
-    .order("published_at", { ascending: false })
-    .limit(50);
-
-  const initial = publicCard.name.charAt(0).toUpperCase();
+  const [profilePhotos, { data: messages }] = await Promise.all([
+    getProfilePhotoRanking(publicCard.id),
+    supabase
+      .schema("api")
+      .from("messages")
+      .select("id, card_id, content, nickname, status, published_at, created_at, updated_at")
+      .eq("card_id", publicCard.id)
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(50),
+  ]);
 
   return (
     <div className="mx-auto w-full max-w-2xl min-h-screen border-x border-white/10 bg-black">
@@ -106,9 +109,17 @@ export default async function CardPage({ params }: CardPageProps) {
         </div>
 
         {publicCard.description ? (
-          <p className="mt-2.5 max-w-md text-sm text-white/90 leading-relaxed">{publicCard.description}</p>
+          <p className="mt-2.5 max-w-md text-sm text-white/90 leading-relaxed">
+            {publicCard.description}
+          </p>
         ) : null}
       </section>
+
+      <ProfilePhotoVoting
+        cardId={publicCard.id}
+        leaderId={publicCard.profile_photo_id}
+        photos={profilePhotos}
+      />
 
       {/* Message Feed & Inline Post Composer */}
       <MessageFeed

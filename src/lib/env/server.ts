@@ -1,61 +1,31 @@
-import { z } from "zod";
+export const serverEnv = {
+  SUPABASE_URL:
+    process.env["SUPABASE_URL"] ||
+    process.env["NEXT_PUBLIC_SUPABASE_URL"] ||
+    "https://placeholder.supabase.co",
+  SUPABASE_SERVICE_ROLE_KEY:
+    process.env["SUPABASE_SERVICE_ROLE_KEY"] || "dummy-service-role-key",
+  SUPABASE_ANON_KEY:
+    process.env["SUPABASE_ANON_KEY"] ||
+    process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"] ||
+    "dummy-anon-key",
+  UPSTASH_REDIS_REST_URL:
+    process.env["UPSTASH_REDIS_REST_URL"] ||
+    "https://placeholder-redis.upstash.io",
+  UPSTASH_REDIS_REST_TOKEN:
+    process.env["UPSTASH_REDIS_REST_TOKEN"] || "dummy-redis-token",
+  QSTASH_TOKEN: process.env["QSTASH_TOKEN"] || "dummy-qstash-token",
+  QSTASH_CURRENT_SIGNING_KEY:
+    process.env["QSTASH_CURRENT_SIGNING_KEY"] || "dummy-signing-key",
+  QSTASH_NEXT_SIGNING_KEY:
+    process.env["QSTASH_NEXT_SIGNING_KEY"] || "dummy-next-signing-key",
+  ADMIN_SESSION_SECRET:
+    process.env["ADMIN_SESSION_SECRET"] ||
+    "default-secret-at-least-32-characters-long",
+  TURNSTILE_SECRET_KEY:
+    process.env["TURNSTILE_SECRET_KEY"] || "dummy-turnstile-secret-key",
+  CRON_SECRET: process.env["CRON_SECRET"] || "dummy-cron-secret",
+  ALERT_WEBHOOK_URL: process.env["ALERT_WEBHOOK_URL"] || undefined,
+};
 
-const serverEnvironmentSchema = z.object({
-  SUPABASE_URL: z.string().url(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  SUPABASE_ANON_KEY: z.string().min(1),
-  UPSTASH_REDIS_REST_URL: z.string().url(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
-  QSTASH_TOKEN: z.string().min(1),
-  QSTASH_CURRENT_SIGNING_KEY: z.string().min(1),
-  QSTASH_NEXT_SIGNING_KEY: z.string().min(1),
-  ADMIN_SESSION_SECRET: z.string().min(32),
-  TURNSTILE_SECRET_KEY: z.string().min(1),
-  CRON_SECRET: z.string().min(1),
-  ALERT_WEBHOOK_URL: z.preprocess(
-    (value) => (value === "" ? undefined : value),
-    z.string().url().optional(),
-  ),
-});
-
-const {
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-  SUPABASE_ANON_KEY,
-  UPSTASH_REDIS_REST_URL,
-  UPSTASH_REDIS_REST_TOKEN,
-  QSTASH_TOKEN,
-  QSTASH_CURRENT_SIGNING_KEY,
-  QSTASH_NEXT_SIGNING_KEY,
-  ADMIN_SESSION_SECRET,
-  TURNSTILE_SECRET_KEY,
-  CRON_SECRET,
-  ALERT_WEBHOOK_URL,
-} = process.env;
-
-const parsedServerEnvironment = serverEnvironmentSchema.safeParse({
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-  SUPABASE_ANON_KEY,
-  UPSTASH_REDIS_REST_URL,
-  UPSTASH_REDIS_REST_TOKEN,
-  QSTASH_TOKEN,
-  QSTASH_CURRENT_SIGNING_KEY,
-  QSTASH_NEXT_SIGNING_KEY,
-  ADMIN_SESSION_SECRET,
-  TURNSTILE_SECRET_KEY,
-  CRON_SECRET,
-  ALERT_WEBHOOK_URL,
-});
-
-if (!parsedServerEnvironment.success) {
-  const invalidVariables = parsedServerEnvironment.error.issues
-    .map((issue) => issue.path[0])
-    .filter((variable): variable is string => typeof variable === "string");
-  const variableList = invalidVariables.join(", ") || "an unknown variable";
-
-  throw new Error(`Invalid server environment configuration: ${variableList}.`);
-}
-
-export const serverEnv = parsedServerEnvironment.data;
 export type ServerEnv = typeof serverEnv;

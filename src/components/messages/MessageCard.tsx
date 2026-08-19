@@ -1,5 +1,5 @@
-import type { Message } from "@/types/database";
 import { User } from "@phosphor-icons/react/dist/ssr";
+import type { Message } from "@/types/database";
 
 interface MessageCardProps {
   readonly message: Message;

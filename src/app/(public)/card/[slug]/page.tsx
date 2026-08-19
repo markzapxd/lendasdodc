@@ -13,6 +13,9 @@ import {
   parsePublicMessage,
 } from "@/lib/supabase/public-content";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface CardPageProps {
   readonly params: Promise<{ readonly slug: string }>;
 }

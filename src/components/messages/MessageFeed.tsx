@@ -1,12 +1,12 @@
 "use client";
 
+import { Check, PaperPlaneRight, UserCircle } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { Check, PaperPlaneRight, UserCircle } from "@phosphor-icons/react";
 import { submitMessageAction } from "@/app/(public)/actions";
+import { useTheme } from "@/components/theme/ThemeContext";
 import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
 import type { Message } from "@/types/database";
-import { useTheme } from "@/components/theme/ThemeContext";
 import { MessageCard } from "./MessageCard";
 
 interface MessageFeedProps {
@@ -74,7 +74,11 @@ export function MessageFeed({ messages: initialMessages, cardId }: MessageFeedPr
             <span>Mensagem publicada com sucesso no perfil!</span>
           </div>
         ) : (
-          <form id={`message-form-${cardId}`} onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <form
+            id={`message-form-${cardId}`}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-3"
+          >
             <div className="flex gap-3 items-start">
               {/* Default User Avatar Icon */}
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[#a595b8]">
@@ -127,9 +131,7 @@ export function MessageFeed({ messages: initialMessages, cardId }: MessageFeedPr
             <p className="text-xs text-[#a595b8]/60 mt-1">Seja o primeiro a publicar algo!</p>
           </div>
         ) : (
-          liveMessages.map((message) => (
-            <MessageCard key={message.id} message={message} />
-          ))
+          liveMessages.map((message) => <MessageCard key={message.id} message={message} />)
         )}
       </section>
     </div>

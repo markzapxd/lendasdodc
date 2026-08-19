@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Cards,
   ChatCircleDots,
@@ -11,6 +9,8 @@ import {
   ShieldWarning,
   SignOut,
 } from "@phosphor-icons/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navigation = [
   { name: "Dashboard", href: "/abacaxi", icon: Gauge },
@@ -55,9 +55,7 @@ export function Sidebar() {
               }`}
             >
               <Icon
-                className={`h-4 w-4 shrink-0 ${
-                  isActive ? "text-[#ec195a]" : "text-[#a595b8]/70"
-                }`}
+                className={`h-4 w-4 shrink-0 ${isActive ? "text-[#ec195a]" : "text-[#a595b8]/70"}`}
               />
               <span>{item.name}</span>
             </Link>

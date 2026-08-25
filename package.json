@@ -73,7 +73,7 @@
     "react-doctor": "^0.9.3",
     "react-grab": "^0.1.50",
     "react-scan": "^0.5.7",
-    "supabase": "^2.111.0",
+    "supabase": "^2.115.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "uuid": "^14.0.1",
